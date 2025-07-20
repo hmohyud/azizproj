@@ -21,6 +21,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
+  "homepage": "https://hmohyud.github.io/azizproj",
   "eslintConfig": {
     "extends": [
       "react-app",
