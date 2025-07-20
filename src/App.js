@@ -11,14 +11,20 @@ function App() {
   const [results, setResults] = useState({ offers: [], useful_sites: [] });
   const [error, setError] = useState(null);
 
+  // CHANGE: backendUrl as state!
+  const [backendUrl, setBackendUrl] = useState(
+    "http://localhost:8000/api/search"
+  );
+
   const chipInputRef = useRef();
   const controllerRef = useRef(null); // For aborting fetch
   const streamIdRef = useRef(null);
 
-  const BACKEND_URL = "http://localhost:8000/api/search";
-  const STOP_URL = "http://localhost:8000/api/stop";
+  // Compute stop URL from backend URL
+  function getStopUrl() {
+    return backendUrl.replace("/search", "/stop");
+  }
 
-  // Handle chip add on Enter/comma or blur
   function handleChipInput(e) {
     if (
       e.type === "blur" ||
@@ -41,14 +47,13 @@ function App() {
 
   // ---- STOP logic ----
   const handleStop = async () => {
-    // console.log("stopped")
     if (controllerRef.current) controllerRef.current.abort();
     setLoading(false);
     setStatus("Stopped.");
     setPercent(100);
     if (streamIdRef.current) {
       try {
-        await fetch(STOP_URL, {
+        await fetch(getStopUrl(), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ stream_id: streamIdRef.current }),
@@ -58,11 +63,8 @@ function App() {
   };
 
   // Main submit with streaming progress support
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, manualUrl = null) => {
     e.preventDefault();
-    // if (loading) return;
-
-    // if (loading || status.startsWith("Stopped")) return;
     if (loading || status.startsWith("Stopped")) {
       setStatus("");
       return;
@@ -79,8 +81,10 @@ function App() {
     const controller = new AbortController();
     controllerRef.current = controller;
 
+    let urlToUse = manualUrl || backendUrl;
+
     try {
-      const res = await fetch(BACKEND_URL, {
+      const res = await fetch(urlToUse, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
@@ -92,7 +96,6 @@ function App() {
       });
       if (!res.body) throw new Error("No response body from backend.");
 
-      // Stream lines as they come in
       const reader = res.body.getReader();
       let buffer = "";
       let done = false;
@@ -104,7 +107,7 @@ function App() {
         if (value) {
           buffer += new TextDecoder().decode(value, { stream: true });
           let lines = buffer.split("\n");
-          buffer = lines.pop(); // last is possibly incomplete
+          buffer = lines.pop();
           for (const line of lines) {
             if (!line.trim()) continue;
             let chunk;
@@ -117,9 +120,7 @@ function App() {
             if (typeof chunk.percent === "number") setPercent(chunk.percent);
             if (chunk.error) setError(chunk.error);
 
-            // Incremental offers: add as they come
             if (chunk.offer) {
-              // Avoid duplicates
               const url = chunk.offer.url;
               if (!offersSoFar.some((o) => o.url === url)) {
                 offersSoFar = [...offersSoFar, chunk.offer];
@@ -133,9 +134,7 @@ function App() {
               });
             }
 
-            // Only overwrite if the search is finished
             if ((chunk.offers || chunk.useful_sites) && chunk.percent === 100) {
-              // Accept final arrays only if provided (could be empty at end)
               offersSoFar =
                 chunk.offers !== undefined ? chunk.offers : offersSoFar;
               usefulSitesSoFar =
@@ -162,11 +161,35 @@ function App() {
       controllerRef.current = null;
       streamIdRef.current = null;
     } catch (err) {
-      if (err.name !== "AbortError") {
+      // HANDLE SERVER UNREACHABLE
+      if (
+        err.message.includes("Failed to fetch") ||
+        err.message.includes("No response body")
+      ) {
+        let promptUrl = window.prompt(
+          "Could not reach the backend server.\nPlease enter a new backend URL (including /api/search):",
+          backendUrl
+        );
+        if (promptUrl && promptUrl.trim()) {
+          setBackendUrl(promptUrl.trim());
+          setLoading(false);
+          setTimeout(() => {
+            handleSubmit(
+              { preventDefault: () => {} }, // fake event
+              promptUrl.trim()
+            );
+          }, 100);
+        } else {
+          setError(
+            "Backend server not reachable. Please reload the page and try again."
+          );
+          setLoading(false);
+        }
+      } else if (err.name !== "AbortError") {
         setError(err.message || "Unknown error");
         setStatus("Error");
+        setLoading(false);
       }
-      setLoading(false);
       setPercent(0);
       controllerRef.current = null;
       streamIdRef.current = null;
@@ -477,7 +500,6 @@ function App() {
                     Price:{" "}
                     <b>{o.price ? `${o.price} ${o.currency || ""}` : "N/A"}</b>
                   </div>
-                  {/* Show images/diagrams if present */}
                   {o.images && o.images.length > 0 && (
                     <div style={{ margin: "10px 0" }}>
                       <div
