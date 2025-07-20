@@ -4,9 +4,8 @@ import random
 import json
 import threading
 import uuid
+import sys
 
-
-from pyngrok import ngrok
 from urllib.parse import urlparse, urljoin
 from flask import Flask, request, Response, jsonify
 from flask_cors import CORS
@@ -19,6 +18,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 import requests
 
+# Only import pyngrok if user wants it (to avoid dependency if unused)
+use_ngrok = any(arg in sys.argv for arg in ["--ngrok", "-ngrok"])
+if use_ngrok:
+    from pyngrok import ngrok
 
 # ======== LOAD SECRETS & SETUP ========
 load_dotenv()
@@ -70,8 +73,6 @@ def duckduckgo_search(query, max_sites=3, stream_id=None):
         driver.quit()
     return links
 
-
-
 def extract_info_and_queries(request_string):
     sys = (
         "Extract all aerospace part numbers and the quantity (if specified) from the following request. "
@@ -94,8 +95,6 @@ def extract_info_and_queries(request_string):
     )
     return json.loads(resp.choices[0].message.content)
 
-
-
 def scrape_page(url, max_images=5, stream_id=None):
     headers = {
         "User-Agent": f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/{random.randint(500,599)}.36 (KHTML, like Gecko) Chrome/11{random.randint(0,99)}.0.0.0 Safari/537.36"
@@ -117,7 +116,6 @@ def scrape_page(url, max_images=5, stream_id=None):
             if src.startswith("//"):
                 src = "https:" + src
             elif src.startswith("/"):
-                
                 src = urljoin(url, src)
             if src.startswith("http") and src not in images:
                 images.append(src)
@@ -132,7 +130,6 @@ def analyze_with_gpt(part_numbers, quantity, url, text, images, stream_id=None):
         print("[STOP CHECK] Stopped before GPT call")
         return {'found': False, 'images': []}
 
-    # Format the part_numbers for prompt clarity
     part_number_list = (
         part_numbers if isinstance(part_numbers, list) else [part_numbers]
     )
@@ -171,12 +168,10 @@ def analyze_with_gpt(part_numbers, quantity, url, text, images, stream_id=None):
         response = json.loads(resp.choices[0].message.content)
         response["images"] = response.get("images", []) or []
 
-        # Extra backend check: Only accept if part_number matches input or is a cross-ref
         if not response.get("found"):
             return response
 
         found_number = str(response.get("part_number", "")).upper()
-        # Accept if direct match or cross-ref'd (as indicated by LLM with 'equivalent')
         is_direct_match = any(str(pn).upper() == found_number for pn in part_number_list)
         is_cross_ref = (
             response.get("equivalent") 
@@ -190,7 +185,6 @@ def analyze_with_gpt(part_numbers, quantity, url, text, images, stream_id=None):
     except Exception as e:
         print(f"[STOP CHECK] GPT call error or stopped: {e}")
         return {'found': False, 'images': []}
-
 
 def stream_auto_part_search(request_string, info_type, stream_id):
     try:
@@ -311,5 +305,26 @@ def api_stop():
         return jsonify({"stopped": True})
     return jsonify({"error": "No active search with that stream_id"}), 400
 
+@app.route("/api/serverinfo", methods=["GET"])
+def api_serverinfo():
+    return jsonify({
+        "public_url": os.environ.get("PUBLIC_URL"),
+        "local_url": request.host_url
+    })
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, threaded=True)
+    port = 8000
+    public_url = None
+    if use_ngrok:
+        try:
+            public_url = ngrok.connect(port, bind_tls=True)
+            print(f" * ngrok tunnel running: {public_url}")
+            os.environ["PUBLIC_URL"] = str(public_url)
+        except Exception as e:
+            print(f" ! Could not start ngrok tunnel: {e}")
+            os.environ["PUBLIC_URL"] = ""
+    else:
+        print(f" * ngrok tunnel disabled (run with --ngrok or -ngrok to enable)")
+        os.environ["PUBLIC_URL"] = ""
+    print(f" * Local: http://localhost:{port}")
+    app.run(host="0.0.0.0", port=port, threaded=True)
