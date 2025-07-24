@@ -284,7 +284,7 @@ def stream_auto_part_search(request_string, info_type, stream_id):
 
 # ========== FLASK ROUTES ==========
 
-@app.route("/api/search", methods=["POST"])
+@app.route("/search", methods=["POST"])
 def api_search():
     data = request.get_json(force=True)
     req_str = data.get("request_string", "")
@@ -296,7 +296,7 @@ def api_search():
     headers = {'X-Accel-Buffering': 'no'}
     return Response(event_stream(), mimetype="text/plain", headers=headers)
 
-@app.route("/api/stop", methods=["POST"])
+@app.route("/stop", methods=["POST"])
 def api_stop():
     data = request.get_json(force=True)
     stream_id = data.get("stream_id")
@@ -305,7 +305,7 @@ def api_stop():
         return jsonify({"stopped": True})
     return jsonify({"error": "No active search with that stream_id"}), 400
 
-@app.route("/api/serverinfo", methods=["GET"])
+@app.route("/serverinfo", methods=["GET"])
 def api_serverinfo():
     return jsonify({
         "public_url": os.environ.get("PUBLIC_URL"),

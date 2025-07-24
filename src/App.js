@@ -12,17 +12,17 @@ function App() {
   const [error, setError] = useState(null);
 
   // CHANGE: backendUrl as state!
-  const [backendUrl, setBackendUrl] = useState(
-    "http://localhost:8000/api/search"
-  );
+  const [backendUrl, setBackendUrl] = useState("http://localhost:8000");
 
   const chipInputRef = useRef();
   const controllerRef = useRef(null); // For aborting fetch
   const streamIdRef = useRef(null);
 
-  // Compute stop URL from backend URL
+  function getSearchUrl() {
+    return backendUrl.replace(/\/+$/, "") + "/search";
+  }
   function getStopUrl() {
-    return backendUrl.replace("/search", "/stop");
+    return backendUrl.replace(/\/+$/, "") + "/stop";
   }
 
   function handleChipInput(e) {
@@ -81,7 +81,7 @@ function App() {
     const controller = new AbortController();
     controllerRef.current = controller;
 
-    let urlToUse = manualUrl || backendUrl;
+    let urlToUse = manualUrl || getSearchUrl();
 
     try {
       const res = await fetch(urlToUse, {
@@ -167,7 +167,7 @@ function App() {
         err.message.includes("No response body")
       ) {
         let promptUrl = window.prompt(
-          "Could not reach the backend server.\nPlease enter a new backend URL (including /api/search):",
+          "Could not reach the backend server.\nPlease enter a new backend URL (including /search):",
           backendUrl
         );
         if (promptUrl && promptUrl.trim()) {
@@ -196,6 +196,17 @@ function App() {
     }
   };
 
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+
+  function handleAdvancedBlur(e) {
+    // Collapse if click is outside input or button
+    setTimeout(() => setAdvancedOpen(false), 120);
+  }
+
+  function handleBackendUrlChange(e) {
+    setBackendUrl(e.target.value);
+  }
+
   // UI as before, but button switches
   return (
     <div
@@ -208,6 +219,94 @@ function App() {
         fontFamily: "'Inter', 'Segoe UI', sans-serif",
       }}
     >
+      <div style={{ position: "absolute", top: 18, right: 18, zIndex: 50 }}>
+        <div
+          style={{
+            background: "#f2f5ff",
+            border: "1px solid #c6d5ef",
+            borderRadius: "0.75em",
+            boxShadow: "0 1px 6px rgba(20,40,90,0.04)",
+            padding: advancedOpen ? "13px 18px 16px 18px" : "8px 16px",
+            minWidth: 0,
+            minHeight: 0,
+            transition: "all 0.16s",
+            cursor: "pointer",
+            fontSize: 15,
+            fontWeight: 500,
+            color: "#23406a",
+            userSelect: "none",
+          }}
+          onClick={() => setAdvancedOpen((v) => !v)}
+        >
+          {advancedOpen ? (
+            <div style={{ minWidth: 260 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 7,
+                }}
+              >
+                <div style={{ fontWeight: 600, color: "#29419f" }}>
+                  Backend Server URL
+                </div>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setAdvancedOpen(false);
+                  }}
+                  style={{
+                    background: "#eee",
+                    color: "#3754ad",
+                    fontWeight: 600,
+                    border: "none",
+                    borderRadius: "0.55em",
+                    padding: "5px 13px",
+                    fontSize: 14,
+                    cursor: "pointer",
+                    marginTop: 0, // (override previous marginTop)
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+
+              <input
+                style={{
+                  width: 270,
+                  border: "1px solid #b6c7e3",
+                  borderRadius: "0.55em",
+                  fontSize: 14,
+                  padding: "7px 10px",
+                  background: "#fff",
+                  color: "#183c7a",
+                }}
+                value={backendUrl}
+                onChange={handleBackendUrlChange}
+                // Do NOT close when clicking the input!
+                onClick={(e) => e.stopPropagation()}
+              />
+              {/* <div style={{ fontSize: 13, marginTop: 5, color: "#697ba8" }}> */}
+              {/* Ex: http://localhost:8000/search <br /> */}
+              {/* (Advanced users only) */}
+              {/* </div> */}
+            </div>
+          ) : (
+            <>
+              {/* <span style={{ marginRight: 7, fontWeight: 600 }}>Advanced</span> */}
+              <span style={{ fontSize: 13, color: "#6b82b8" }}>
+                Server:{" "}
+                {backendUrl.length > 30
+                  ? backendUrl.slice(0, 30) + "..."
+                  : backendUrl}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+
       <div
         style={{
           background: "#fff",
