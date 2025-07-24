@@ -10,6 +10,8 @@ function App() {
   const [percent, setPercent] = useState(0);
   const [results, setResults] = useState({ offers: [], useful_sites: [] });
   const [error, setError] = useState(null);
+  const [width, setWidth] = useState(3);
+  const [depth, setDepth] = useState(3);
 
   // CHANGE: backendUrl as state!
   const [backendUrl, setBackendUrl] = useState("http://localhost:8000");
@@ -198,10 +200,10 @@ function App() {
 
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
-  function handleAdvancedBlur(e) {
-    // Collapse if click is outside input or button
-    setTimeout(() => setAdvancedOpen(false), 120);
-  }
+  // function handleAdvancedBlur(e) {
+  //   // Collapse if click is outside input or button
+  //   setTimeout(() => setAdvancedOpen(false), 120);
+  // }
 
   function handleBackendUrlChange(e) {
     setBackendUrl(e.target.value);
@@ -311,6 +313,7 @@ function App() {
         style={{
           background: "#fff",
           padding: "2.5rem 2rem",
+          paddingTop: "0.5rem",
           borderRadius: "1.25rem",
           boxShadow: "0 8px 32px rgba(38,57,120,.11)",
           maxWidth: 540,
@@ -318,7 +321,7 @@ function App() {
           margin: "2rem auto",
         }}
       >
-        <h2
+        {/* <h2
           style={{
             textAlign: "center",
             fontWeight: 700,
@@ -329,8 +332,166 @@ function App() {
           }}
         >
           SpecFetch
-        </h2>
+        </h2> */}
 
+        <span
+          style={{
+            justifyContent: "center",
+            alignContent: "center",
+            width: "100%",
+            display: "flex",
+          }}
+        >
+          <svg
+            width="150"
+            height="150"
+            viewBox="0 0 120 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="56"
+              cy="46"
+              r="28"
+              stroke="#3573FA"
+              stroke-width="5"
+              fill="#F6F9FE"
+            />
+            <rect
+              x="75"
+              y="65"
+              width="28"
+              height="7"
+              rx="3.5"
+              transform="rotate(45 75 65)"
+              fill="#3573FA"
+            />
+            <g>
+              <g>
+                <g transform="rotate(0 56 46)">
+                  <rect
+                    x="54.6"
+                    y="30.5"
+                    width="2.8"
+                    height="3.5"
+                    rx="0.9"
+                    fill="#2976DE"
+                  />
+                </g>
+                <g transform="rotate(36 56 46)">
+                  <rect
+                    x="54.6"
+                    y="30.5"
+                    width="2.8"
+                    height="3.5"
+                    rx="0.9"
+                    fill="#2976DE"
+                  />
+                </g>
+                <g transform="rotate(72 56 46)">
+                  <rect
+                    x="54.6"
+                    y="30.5"
+                    width="2.8"
+                    height="3.5"
+                    rx="0.9"
+                    fill="#2976DE"
+                  />
+                </g>
+                <g transform="rotate(108 56 46)">
+                  <rect
+                    x="54.6"
+                    y="30.5"
+                    width="2.8"
+                    height="3.5"
+                    rx="0.9"
+                    fill="#2976DE"
+                  />
+                </g>
+                <g transform="rotate(144 56 46)">
+                  <rect
+                    x="54.6"
+                    y="30.5"
+                    width="2.8"
+                    height="3.5"
+                    rx="0.9"
+                    fill="#2976DE"
+                  />
+                </g>
+                <g transform="rotate(180 56 46)">
+                  <rect
+                    x="54.6"
+                    y="30.5"
+                    width="2.8"
+                    height="3.5"
+                    rx="0.9"
+                    fill="#2976DE"
+                  />
+                </g>
+                <g transform="rotate(216 56 46)">
+                  <rect
+                    x="54.6"
+                    y="30.5"
+                    width="2.8"
+                    height="3.5"
+                    rx="0.9"
+                    fill="#2976DE"
+                  />
+                </g>
+                <g transform="rotate(252 56 46)">
+                  <rect
+                    x="54.6"
+                    y="30.5"
+                    width="2.8"
+                    height="3.5"
+                    rx="0.9"
+                    fill="#2976DE"
+                  />
+                </g>
+                <g transform="rotate(288 56 46)">
+                  <rect
+                    x="54.6"
+                    y="30.5"
+                    width="2.8"
+                    height="3.5"
+                    rx="0.9"
+                    fill="#2976DE"
+                  />
+                </g>
+                <g transform="rotate(324 56 46)">
+                  <rect
+                    x="54.6"
+                    y="30.5"
+                    width="2.8"
+                    height="3.5"
+                    rx="0.9"
+                    fill="#2976DE"
+                  />
+                </g>
+              </g>
+              <circle
+                cx="56"
+                cy="46"
+                r="11"
+                fill="#fff"
+                stroke="#2976DE"
+                stroke-width="2"
+              />
+              <circle cx="56" cy="46" r="3" fill="#2976DE" />
+            </g>
+            <text
+              x="60"
+              y="104"
+              text-anchor="middle"
+              fill="#29419F"
+              font-size="17"
+              font-family="Inter,Segoe UI,sans-serif"
+              font-weight="700"
+            >
+              SpecFetch
+            </text>
+          </svg>
+        </span>
         <form onSubmit={handleSubmit} style={{ marginBottom: 28 }}>
           <textarea
             style={{
@@ -357,105 +518,221 @@ function App() {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
+              gap: 18,
               flexWrap: "wrap",
               marginBottom: 16,
               minHeight: 46,
             }}
           >
-            <label
-              htmlFor="chip-input"
-              style={{
-                fontSize: 15,
-                color: "#3e5376",
-                fontWeight: 500,
-                marginRight: 8,
-                whiteSpace: "nowrap",
-              }}
-            >
-              Info to fetch:
-            </label>
+            {/* Info Chips Input */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                flexWrap: "wrap",
-                background: "#f6f9fe",
-                border: "1px solid #c6d5ef",
-                borderRadius: "0.7rem",
-                padding: "5px 10px",
-                minHeight: 36,
-                minWidth: 0,
-                flex: "1 1 auto",
-                maxWidth: 360,
+                gap: 8,
+                width: "100%",
               }}
-              onClick={() =>
-                chipInputRef.current && chipInputRef.current.focus()
-              }
             >
-              {infoChips.map((chip, idx) => (
-                <span
-                  key={idx}
+              <label
+                htmlFor="chip-input"
+                style={{
+                  fontSize: 15,
+                  color: "#3e5376",
+                  fontWeight: 500,
+                  marginRight: 8,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Info to fetch:
+              </label>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  background: "#f6f9fe",
+                  border: "1px solid #c6d5ef",
+                  borderRadius: "0.7rem",
+                  padding: "5px 10px",
+                  minHeight: 36,
+                  minWidth: 0,
+                  flex: "1 1 auto",
+                  // maxWidth: 360,
+                }}
+                onClick={() =>
+                  chipInputRef.current && chipInputRef.current.focus()
+                }
+              >
+                {infoChips.map((chip, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      background: "#e3ecfb",
+                      color: "#264fa5",
+                      borderRadius: "2em",
+                      padding: "0.27em 0.85em 0.27em 0.8em",
+                      margin: "2px 3px",
+                      fontSize: 14,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {chip}
+                    <button
+                      type="button"
+                      onClick={() => removeChip(idx)}
+                      style={{
+                        marginLeft: 5,
+                        background: "transparent",
+                        border: "none",
+                        color: "#999",
+                        fontSize: 16,
+                        cursor: "pointer",
+                        outline: "none",
+                        padding: 0,
+                        lineHeight: 1,
+                      }}
+                      aria-label="Remove"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                <input
+                  id="chip-input"
+                  ref={chipInputRef}
                   style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    background: "#e3ecfb",
-                    color: "#264fa5",
-                    borderRadius: "2em",
-                    padding: "0.27em 0.85em 0.27em 0.8em",
-                    margin: "2px 3px",
+                    border: "none",
+                    background: "transparent",
+                    fontSize: 15,
+                    outline: "none",
+                    minWidth: 45,
+                    marginLeft: 2,
+                    marginRight: 2,
+                    padding: 0,
+                    color: "#23406a",
+                    flex: "1 1 90px",
+                  }}
+                  type="text"
+                  value={chipInput}
+                  disabled={loading}
+                  placeholder={
+                    infoChips.length === 0 ? "e.g. price, lead time" : ""
+                  }
+                  onChange={(e) => setChipInput(e.target.value)}
+                  onBlur={handleChipInput}
+                  onKeyDown={handleChipInput}
+                />
+              </div>
+            </div>
+            {/* Width & Depth */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                minWidth: "100%",
+                gap: 24,
+                justifyContent: "space-between",
+              }}
+            >
+              {/* Width bundle */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "#f6f9fe",
+                  borderRadius: 8,
+                  padding: "4px 12px",
+                }}
+              >
+                <label
+                  style={{
                     fontSize: 14,
+                    color: "#2b407a",
                     fontWeight: 500,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 4,
                   }}
                 >
-                  {chip}
-                  <button
-                    type="button"
-                    onClick={() => removeChip(idx)}
+                  Width:
+                  <input
+                    type="number"
+                    min={1}
+                    max={10}
+                    step={1}
+                    value={width}
+                    disabled={loading}
+                    onChange={(e) => setWidth(Number(e.target.value))}
                     style={{
-                      marginLeft: 5,
-                      background: "transparent",
-                      border: "none",
-                      color: "#999",
-                      fontSize: 16,
-                      cursor: "pointer",
-                      outline: "none",
-                      padding: 0,
-                      lineHeight: 1,
+                      width: 38,
+                      fontSize: 14,
+                      marginLeft: 4,
+                      border: "1px solid #b7c8e6",
+                      borderRadius: 6,
+                      padding: "2px 6px",
+                      background: "#fff",
+                      color: "#29419f",
                     }}
-                    aria-label="Remove"
-                  >
-                    ×
-                  </button>
+                    title="Number of search variants to generate"
+                  />
+                </label>
+                <span style={{ fontSize: 12, color: "#8392b8", marginLeft: 2 }}>
+                  (# of search variants)
                 </span>
-              ))}
-              <input
-                id="chip-input"
-                ref={chipInputRef}
+              </div>
+              {/* Depth bundle */}
+              <div
                 style={{
-                  border: "none",
-                  background: "transparent",
-                  fontSize: 15,
-                  outline: "none",
-                  minWidth: 45,
-                  marginLeft: 2,
-                  marginRight: 2,
-                  padding: 0,
-                  color: "#23406a",
-                  flex: "1 1 90px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "#f6f9fe",
+                  borderRadius: 8,
+                  padding: "4px 12px",
                 }}
-                type="text"
-                value={chipInput}
-                disabled={loading}
-                placeholder={
-                  infoChips.length === 0 ? "e.g. price, lead time" : ""
-                }
-                onChange={(e) => setChipInput(e.target.value)}
-                onBlur={handleChipInput}
-                onKeyDown={handleChipInput}
-              />
+              >
+                <label
+                  style={{
+                    fontSize: 14,
+                    color: "#2b407a",
+                    fontWeight: 500,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                >
+                  Depth:
+                  <input
+                    type="number"
+                    min={1}
+                    max={10}
+                    step={1}
+                    value={depth}
+                    disabled={loading}
+                    onChange={(e) => setDepth(Number(e.target.value))}
+                    style={{
+                      width: 38,
+                      fontSize: 14,
+                      marginLeft: 4,
+                      border: "1px solid #b7c8e6",
+                      borderRadius: 6,
+                      padding: "2px 6px",
+                      background: "#fff",
+                      color: "#29419f",
+                    }}
+                    title="Number of sites to scrape per search variant"
+                  />
+                </label>
+                <span style={{ fontSize: 12, color: "#8392b8", marginLeft: 2 }}>
+                  (# of sites per variant)
+                </span>
+              </div>
             </div>
           </div>
+
           {/* Button swaps between Search and Stop depending on loading */}
           {!loading ? (
             <button

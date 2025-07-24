@@ -186,7 +186,7 @@ def analyze_with_gpt(part_numbers, quantity, url, text, images, stream_id=None):
         print(f"[STOP CHECK] GPT call error or stopped: {e}")
         return {'found': False, 'images': []}
 
-def stream_auto_part_search(request_string, info_type, stream_id):
+def stream_auto_part_search(request_string, info_type, stream_id, width=3, depth=3):
     try:
         print(f"[STREAM] Started stream with id {stream_id}")
         yield json.dumps({"status": "Extracting part numbers & queries...", "percent": 2}) + "\n"
@@ -198,24 +198,28 @@ def stream_auto_part_search(request_string, info_type, stream_id):
 
         part_numbers = info["part_numbers"]
         quantity = info.get("quantity", None)
-        queries = info["queries"]
+        queries = info["queries"][:width]  # width = number of different search queries
 
         offers = []
         useful_sites = []
-        max_urls_per_query = 3
         jobs = []
+        visited_urls = set()
+
         for query in queries:
             if STOP_FLAGS.get(stream_id):
                 print("[STOP CHECK] Stopped during job build")
                 yield json.dumps({"status": "Stopped by user", "stopped": True, "percent": 100, "offers": offers, "useful_sites": useful_sites}) + "\n"
                 return
-            urls = duckduckgo_search(query, max_sites=3, stream_id=stream_id)
+            urls = duckduckgo_search(query, max_sites=depth, stream_id=stream_id)  # depth = links per query
             if STOP_FLAGS.get(stream_id):
                 print("[STOP CHECK] Stopped after search")
                 yield json.dumps({"status": "Stopped by user", "stopped": True, "percent": 100, "offers": offers, "useful_sites": useful_sites}) + "\n"
                 return
-            for url in urls[:max_urls_per_query]:
-                jobs.append((query, url))
+            for url in urls:
+                if url not in visited_urls:
+                    jobs.append((query, url))
+                    visited_urls.add(url)
+
         total_steps = len(jobs)
         if total_steps == 0:
             yield json.dumps({"status": "No search results found.", "percent": 100, "offers": [], "useful_sites": []}) + "\n"
@@ -282,7 +286,6 @@ def stream_auto_part_search(request_string, info_type, stream_id):
         print(f"[STREAM] Ended stream with id {stream_id}")
         STOP_FLAGS.pop(stream_id, None)
 
-# ========== FLASK ROUTES ==========
 
 @app.route("/search", methods=["POST"])
 def api_search():
@@ -290,11 +293,14 @@ def api_search():
     req_str = data.get("request_string", "")
     info_type = data.get("info_type", None)
     stream_id = data.get("stream_id") or str(uuid.uuid4())
-    STOP_FLAGS[stream_id] = False  # Mark as not stopped
+    width = int(data.get("width", 3))   # Default: 3 queries (search string variants)
+    depth = int(data.get("depth", 3))   # Default: 3 links per query
+    STOP_FLAGS[stream_id] = False
     def event_stream():
-        yield from stream_auto_part_search(req_str, info_type, stream_id)
+        yield from stream_auto_part_search(req_str, info_type, stream_id, width=width, depth=depth)
     headers = {'X-Accel-Buffering': 'no'}
     return Response(event_stream(), mimetype="text/plain", headers=headers)
+
 
 @app.route("/stop", methods=["POST"])
 def api_stop():
