@@ -636,6 +636,43 @@ function App() {
                 justifyContent: "space-between",
               }}
             >
+              {!loading ? (
+                <button
+                  type="submit"
+                  disabled={!request.trim()}
+                  style={{
+                    background: "linear-gradient(90deg, #2a62f7, #4b89ff)",
+                    color: "#fff",
+                    border: "none",
+                    padding: "0.7rem 2rem",
+                    fontWeight: 600,
+                    fontSize: 17,
+                    borderRadius: "0.7rem",
+                    cursor: !request.trim() ? "not-allowed" : "pointer",
+                    boxShadow: "0 2px 10px 0 rgba(70,120,220,0.07)",
+                  }}
+                >
+                  Search
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleStop}
+                  style={{
+                    background: "linear-gradient(90deg, #e63e3e, #e68453)",
+                    color: "#fff",
+                    border: "none",
+                    padding: "0.7rem 2rem",
+                    fontWeight: 600,
+                    fontSize: 17,
+                    borderRadius: "0.7rem",
+                    cursor: "pointer",
+                    boxShadow: "0 2px 10px 0 rgba(70,120,220,0.07)",
+                  }}
+                >
+                  {status.startsWith("Stopped") ? "Stopped" : "Stop"}
+                </button>
+              )}
               {/* Width bundle */}
               <div
                 style={{
@@ -734,7 +771,7 @@ function App() {
           </div>
 
           {/* Button swaps between Search and Stop depending on loading */}
-          {!loading ? (
+          {/* {!loading ? (
             <button
               type="submit"
               disabled={!request.trim()}
@@ -770,7 +807,7 @@ function App() {
             >
               {status.startsWith("Stopped") ? "Stopped" : "Stop"}
             </button>
-          )}
+          )} */}
         </form>
 
         {/* Progress bar and status */}
