@@ -17,6 +17,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 import requests
+import undetected_chromedriver as uc
 
 # Only import pyngrok if user wants it (to avoid dependency if unused)
 use_ngrok = any(arg in sys.argv for arg in ["--ngrok", "-ngrok"])
@@ -42,14 +43,24 @@ def stoppable_sleep(duration, stream_id, chunk=0.15):
     return False
 
 def duckduckgo_search(query, max_sites=3, stream_id=None):
-    options = Options()
-    # options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--window-size=1200,1000")
-    service = Service("/usr/local/bin/chromedriver")
-    driver = webdriver.Chrome(service=service, options=options)
+    # options = Options()
+    # # options.add_argument("--headless")
+    # options.add_argument("--no-sandbox")
+    # options.add_argument("--disable-gpu")
+    # options.add_argument("--disable-dev-shm-usage")
+    # options.add_argument("--window-size=1200,1000")
+    # service = Service("/usr/local/bin/chromedriver")
+    # driver = webdriver.Chrome(service=service, options=options)
+    uc_options = uc.ChromeOptions()
+    uc_options.add_argument("--no-sandbox")
+    uc_options.add_argument("--disable-gpu")
+    uc_options.add_argument("--disable-dev-shm-usage")
+    uc_options.add_argument("--window-size=1200,1000")
+    # Optionally keep this headful for better realism
+    # uc_options.add_argument("--headless=new")
+
+    driver = uc.Chrome(options=uc_options)
+
     links = []
     try:
         driver.get("https://duckduckgo.com/?q=" + query.replace(" ", "+"))
