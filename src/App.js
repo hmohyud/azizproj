@@ -60,7 +60,7 @@ function App() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ stream_id: streamIdRef.current }),
         });
-      } catch (e) {}
+      } catch (e) { }
     }
   };
 
@@ -177,7 +177,7 @@ function App() {
           setLoading(false);
           setTimeout(() => {
             handleSubmit(
-              { preventDefault: () => {} }, // fake event
+              { preventDefault: () => { } }, // fake event
               promptUrl.trim()
             );
           }, 100);
@@ -237,6 +237,7 @@ function App() {
             fontWeight: 500,
             color: "#23406a",
             userSelect: "none",
+            overflow: "hidden"
           }}
           onClick={() => setAdvancedOpen((v) => !v)}
         >
@@ -541,6 +542,7 @@ function App() {
                   fontWeight: 500,
                   marginRight: 8,
                   whiteSpace: "nowrap",
+                  overflow: "hidden"
                 }}
               >
                 Info to fetch:
@@ -576,6 +578,7 @@ function App() {
                       margin: "2px 3px",
                       fontSize: 14,
                       fontWeight: 500,
+                      overflow: "hidden"
                     }}
                   >
                     {chip}
@@ -692,6 +695,7 @@ function App() {
                     display: "flex",
                     alignItems: "center",
                     gap: 4,
+                    // overflow: "hidden"
                   }}
                 >
                   Width:
@@ -739,6 +743,7 @@ function App() {
                     display: "flex",
                     alignItems: "center",
                     gap: 4,
+                    // overflow: "hidden"
                   }}
                 >
                   Depth:
@@ -837,6 +842,7 @@ function App() {
                 fontWeight: 500,
                 textAlign: "center",
                 fontSize: 15,
+                overflow: "hidden"
               }}
             >
               {status} {percent ? `(${percent}%)` : ""}
@@ -854,6 +860,8 @@ function App() {
               marginBottom: 14,
               fontSize: 15,
               textAlign: "center",
+              overflow: "hidden"
+
             }}
           >
             {error}
@@ -920,6 +928,7 @@ function App() {
                           fontSize: 14,
                           fontWeight: 500,
                           color: "#3754ad",
+                          overflow: "hidden"
                         }}
                       >
                         Images / Diagrams:
@@ -994,6 +1003,7 @@ function App() {
                       fontWeight: 500,
                       fontSize: 15,
                       textDecoration: "none",
+                      overflow: "hidden"
                     }}
                   >
                     Source
