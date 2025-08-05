@@ -210,7 +210,8 @@ def stream_auto_part_search(request_string, info_type, stream_id, width=3, depth
         part_numbers = info["part_numbers"]
         quantity = info.get("quantity", None)
         queries = info["queries"][:width]  # width = number of different search queries
-
+        # print("ALL SEARCH QUERIES:", queries)
+        
         offers = []
         useful_sites = []
         jobs = []
@@ -286,7 +287,7 @@ def stream_auto_part_search(request_string, info_type, stream_id, width=3, depth
                 print(f"[STOP CHECK] Stopped during sleep at idx {idx}")
                 yield json.dumps({"status": "Stopped by user", "stopped": True, "percent": 100, "offers": offers, "useful_sites": useful_sites}) + "\n"
                 return
-
+        # print("ALL URLS ACCESSED:", list(visited_urls))
         yield json.dumps({
             "offers": offers,
             "useful_sites": useful_sites,
